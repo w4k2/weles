@@ -17,10 +17,10 @@ class SSGNB(ClassifierMixin, BaseEstimator):
         self.n_classes = len(self.classes)
 
         # Calculate current norm
-        self.means = np.array([np.mean(X[y == label], axis=0)
-                               for label in self.classes])
-        self.stds = np.array([np.std(X[y == label], axis=0)
-                              for label in self.classes])
+        self.means = np.array(
+            [np.mean(X[y == label], axis=0) for label in self.classes]
+        )
+        self.stds = np.array([np.std(X[y == label], axis=0) for label in self.classes])
 
         return self
 
@@ -28,11 +28,8 @@ class SSGNB(ClassifierMixin, BaseEstimator):
         if subspaces is None:
             # Calculate distribution density
             ps = np.product(
-                [
-                    self._pdf(X, self.stds[c], self.means[c]).T
-                    for c in self.classes
-                ],
-                axis=1
+                [self._pdf(X, self.stds[c], self.means[c]).T for c in self.classes],
+                axis=1,
             )
 
             # Establish and return prediction
@@ -47,10 +44,9 @@ class SSGNB(ClassifierMixin, BaseEstimator):
             # - cecha
             # - testowany wzorzec
             # [gęstości rozkładu]
-            psf = np.array([
-                self._pdf(X, self.stds[c], self.means[c]).T
-                for c in self.classes
-            ])
+            psf = np.array(
+                [self._pdf(X, self.stds[c], self.means[c]).T for c in self.classes]
+            )
 
             # Możemy sobie teraz przeiterować podprzestrzenie i dla każdej z
             # nich wyznaczyć podprzestrzenny produkt. Otrzymamy tensor pse o
@@ -59,7 +55,7 @@ class SSGNB(ClassifierMixin, BaseEstimator):
             # - klasa
             # - testowany wzorzec
             # [gęstości rozkładu]
-            pse = np.array([np.product(psf[:,ss,:], axis=1) for ss in subspaces])
+            pse = np.array([np.product(psf[:, ss, :], axis=1) for ss in subspaces])
 
             # Z takiego cudu możliwa jest to prostego wyliczenia macierz
             # predykcji komitetu o wymiarach:

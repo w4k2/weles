@@ -5,6 +5,13 @@ from . import classifiers
 from . import ensembles
 from . import meta
 from . import optimizers
-from . import tests
+from . import statistics
 
-__all__ = ["classifiers", "ensembles", "meta", "optimizers", "tests", "__version__"]
+__all__ = [
+    "classifiers",
+    "ensembles",
+    "meta",
+    "optimizers",
+    "statistics",
+    "__version__",
+]

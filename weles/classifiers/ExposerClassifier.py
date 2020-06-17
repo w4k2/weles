@@ -4,6 +4,7 @@ from sklearn.neighbors import DistanceMetric
 import numpy as np
 import math
 
+
 class ExposerClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, radius=None, p=2, memory=250):
         self.radius = radius
@@ -19,17 +20,11 @@ class ExposerClassifier(BaseEstimator, ClassifierMixin):
         return self
 
     def partial_fit(self, X, y, classes=None):
-
-        # szybciej i prosciej
-        # self.scaler = StandardScaler().fit(X)
-        # self.X_ = self.scaler.transform(X)
-        # self.y_ = np.copy(y)
-        # self.classes_, self.prior = np.unique(y, return_counts=True)
-        # self.metric = DistanceMetric.get_metric(metric="euclidean")
-
         self.scaler = StandardScaler().fit(X)
         self.X_ = (
-            np.concatenate((self.X_, self.scaler.transform(X)), axis=0) if hasattr(self, "X_") else self.scaler.transform(X)
+            np.concatenate((self.X_, self.scaler.transform(X)), axis=0)
+            if hasattr(self, "X_")
+            else self.scaler.transform(X)
         )
         self.y_ = (
             np.concatenate((self.y_, y), axis=0) if hasattr(self, "y_") else np.copy(y)
@@ -43,9 +38,8 @@ class ExposerClassifier(BaseEstimator, ClassifierMixin):
         self.metric = DistanceMetric.get_metric(metric="euclidean")
 
         if self.X_.shape[0] > self.memory:
-            self.X_, self.y_ = self.X_[-self.memory:,:], self.y_[-self.memory:]
+            self.X_, self.y_ = self.X_[-self.memory :, :], self.y_[-self.memory :]
         return self
-
 
     def predict_proba(self, X):
         X_ = self.scaler.transform(X)
