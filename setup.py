@@ -46,7 +46,7 @@ setup(
     version=VERSION,
     download_url=DOWNLOAD_URL,
     packages=find_packages(),
-    include_package_data=True,
+    # include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     long_description=long_description,
     long_description_content_type="text/markdown",
