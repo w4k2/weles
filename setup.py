@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-"""Toolbox for streaming data."""
 from __future__ import absolute_import
 
 import codecs

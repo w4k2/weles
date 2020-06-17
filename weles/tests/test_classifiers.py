@@ -1,7 +1,4 @@
 from sklearn.datasets import make_classification
-import sys
-
-sys.path.append("..")
 import weles as ws
 
 
