@@ -2,7 +2,6 @@ import numpy as np
 from scipy import stats
 from sklearn.base import clone, ClassifierMixin, BaseEstimator
 import matplotlib.pyplot as plt
-from LinearClassifier import LinearClassifier
 from sklearn.preprocessing import StandardScaler
 
 RULES = ["mean", "gmean", "hmean", "rbh"]
@@ -10,7 +9,10 @@ KUNCHEVA = 0.000001
 
 
 class Geometron(ClassifierMixin, BaseEstimator):
-    def __init__(self, n_estimators=3, random_state=None, rule="gmean", sigma=3):
+    def __init__(
+        self, base_estimator, n_estimators=3, random_state=None, rule="gmean", sigma=3
+    ):
+        self.base_estimator = base_estimator
         self.n_estimators = n_estimators
         self.random_state = random_state
         self.rule = rule
@@ -24,7 +26,7 @@ class Geometron(ClassifierMixin, BaseEstimator):
         self.ensemble = []
         for i in range(self.n_estimators):
             sel = np.random.randint(self.n_samples, size=int(self.n_samples))
-            self.ensemble.append(LinearClassifier().fit(X[sel], y[sel]))
+            self.ensemble.append(clone(self.base_estimator).fit(X[sel], y[sel]))
 
         # Test scale for the needs of geometric means
         decfuncs = np.array(

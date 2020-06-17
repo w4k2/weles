@@ -4,10 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
-class UndersampledEnsemble():
+
+class UMCE:
     """
     Shuffled K-fold undersampled ensemble.
     """
+
     def __init__(self, base_clf, dbname):
         self.base_clf = base_clf
         self.dbname = dbname
@@ -53,15 +55,15 @@ class UndersampledEnsemble():
 
         # Calculate weights as balanced accuracy on whole set
         self.weights = np.array(
-            [metrics.balanced_accuracy_score(self.y_train,
-                                             clf.predict(self.X_train))
-             for clf in self.clfs]
+            [
+                metrics.balanced_accuracy_score(self.y_train, clf.predict(self.X_train))
+                for clf in self.clfs
+            ]
         )
 
         scaler = preprocessing.MinMaxScaler()
-        self.nweights = scaler.fit_transform(self.weights.reshape(-1,1)).T[0]
-        self.nweights += .01
-
+        self.nweights = scaler.fit_transform(self.weights.reshape(-1, 1)).T[0]
+        self.nweights += 0.01
 
     def test(self, X_test):
         self.X_test = X_test
@@ -71,86 +73,93 @@ class UndersampledEnsemble():
         segments = list(range(len(self.clfs)))
         p_treshold = 0.01
         for i in range(self.k):
-            a = self.esc[i,:,0]
-            for j in range(i+1,self.k):
-                b = self.esc[j,:,0]
-                p = stats.wilcoxon(a,b).pvalue
-                c = (i,j)
+            a = self.esc[i, :, 0]
+            for j in range(i + 1, self.k):
+                b = self.esc[j, :, 0]
+                p = stats.wilcoxon(a, b).pvalue
+                c = (i, j)
                 if p < p_treshold:
                     segments[i] = j
 
         # Reduced ESC and weights
         self.resc = np.array(
-            [np.mean(self.esc[segments == i,:,:] * self.weights[segments == i, np.newaxis, np.newaxis], axis=0)
-             for i in np.unique(segments)]
+            [
+                np.mean(
+                    self.esc[segments == i, :, :]
+                    * self.weights[segments == i, np.newaxis, np.newaxis],
+                    axis=0,
+                )
+                for i in np.unique(segments)
+            ]
         )
         self.rweights = np.array(
-            [np.mean(self.weights[segments == i])
-             for i in np.unique(segments)]
+            [np.mean(self.weights[segments == i]) for i in np.unique(segments)]
         )
 
         scaler = preprocessing.MinMaxScaler()
-        self.nrweights = scaler.fit_transform(self.rweights.reshape(-1,1)).T[0]
-        self.nrweights += .01
+        self.nrweights = scaler.fit_transform(self.rweights.reshape(-1, 1)).T[0]
+        self.nrweights += 0.01
 
         # Contrasts
-        self.contrast = np.abs(self.esc[:,:,0] - self.esc[:,:,1])
-        self.rcontrast = np.abs(self.resc[:,:,0] - self.resc[:,:,1])
+        self.contrast = np.abs(self.esc[:, :, 0] - self.esc[:, :, 1])
+        self.rcontrast = np.abs(self.resc[:, :, 0] - self.resc[:, :, 1])
 
         # Calculate all the measures
-        self.wesc = self.esc * self.weights[:,np.newaxis,np.newaxis]
-        self.nwesc = self.esc * self.nweights[:,np.newaxis,np.newaxis]
-        self.cwesc = self.wesc * self.contrast[:,:,np.newaxis]
-        self.ncwesc = self.nwesc * self.contrast[:,:,np.newaxis]
+        self.wesc = self.esc * self.weights[:, np.newaxis, np.newaxis]
+        self.nwesc = self.esc * self.nweights[:, np.newaxis, np.newaxis]
+        self.cwesc = self.wesc * self.contrast[:, :, np.newaxis]
+        self.ncwesc = self.nwesc * self.contrast[:, :, np.newaxis]
 
-        self.rwesc = self.resc * self.rweights[:,np.newaxis,np.newaxis]
-        self.nrwesc = self.resc * self.nrweights[:,np.newaxis,np.newaxis]
-        self.rcwesc = self.rwesc * self.rcontrast[:,:,np.newaxis]
-        self.nrcwesc = self.nrwesc * self.rcontrast[:,:,np.newaxis]
+        self.rwesc = self.resc * self.rweights[:, np.newaxis, np.newaxis]
+        self.nrwesc = self.resc * self.nrweights[:, np.newaxis, np.newaxis]
+        self.rcwesc = self.rwesc * self.rcontrast[:, :, np.newaxis]
+        self.nrcwesc = self.nrwesc * self.rcontrast[:, :, np.newaxis]
 
-    def decision_cube(self, reduced = False, mode = 'regular', os = False):
+    def decision_cube(self, reduced=False, mode="regular", os=False):
         esc_ = None
         if reduced:
-            if mode == 'regular':
+            if mode == "regular":
                 esc_ = self.esc
-            elif mode == 'weighted':
+            elif mode == "weighted":
                 esc_ = self.wesc
-            elif mode == 'cweighted':
+            elif mode == "cweighted":
                 esc_ = self.cwesc
-            elif mode == 'nweighted':
+            elif mode == "nweighted":
                 esc_ = self.nwesc
-            elif mode == 'ncweighted':
+            elif mode == "ncweighted":
                 esc_ = self.ncwesc
         else:
-            if mode == 'regular':
+            if mode == "regular":
                 esc_ = self.resc
-            elif mode == 'weighted':
+            elif mode == "weighted":
                 esc_ = self.rwesc
-            elif mode == 'cweighted':
+            elif mode == "cweighted":
                 esc_ = self.rcwesc
-            elif mode == 'nweighted':
+            elif mode == "nweighted":
                 esc_ = self.nrwesc
-            elif mode == 'ncweighted':
+            elif mode == "ncweighted":
                 esc_ = self.nrcwesc
 
         if os:
             return esc_
         else:
-            return esc_[:-1,:,:]
+            return esc_[:-1, :, :]
 
     def predict(self, esc):
         # Basic soft voting
-        return np.argmax(np.sum(esc,axis=0), axis=1)
+        return np.argmax(np.sum(esc, axis=0), axis=1)
 
 
 def ensemble_support_cube(clfs, X):
     return np.array([clf.predict_proba(X) for clf in clfs])
 
+
 def regular_bac(base_clf, X_train, y_train, X_test, y_test):
     regular_clf = base.clone(base_clf)
     regular_clf.fit(X_train, y_train)
     regular_pred = regular_clf.predict(X_test)
-    return metrics.balanced_accuracy_score(y_test,regular_pred)
+    return metrics.balanced_accuracy_score(y_test, regular_pred)
+
 
 def us_os_bac(base_clf, X_train, y_train, X_test, y_test):
     us = under_sampling.RandomUnderSampler()
@@ -164,6 +173,6 @@ def us_os_bac(base_clf, X_train, y_train, X_test, y_test):
     us_pred = us_clf.predict(X_test)
     os_pred = os_clf.predict(X_test)
     return (
-        metrics.balanced_accuracy_score(y_test,us_pred),
-        metrics.balanced_accuracy_score(y_test,os_pred)
+        metrics.balanced_accuracy_score(y_test, us_pred),
+        metrics.balanced_accuracy_score(y_test, os_pred),
     )

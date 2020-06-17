@@ -1,11 +1,10 @@
 # Empty
-from __future__ import absolute_import
 from ._version import __version__
 
-#import ensembles
+from . import classifiers
 from . import ensembles
-from . import utils
+from . import meta
+from . import optimizers
+from . import tests
 
-__all__ = [
-    'ensembles', 'utils', '__version__'
-]
+__all__ = ["classifiers", "ensembles", "meta", "optimizers", "tests", "__version__"]

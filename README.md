@@ -18,8 +18,7 @@
   - `PCASSE`
 - optimizers
   - `RAO`
-- utils
-  - tests
-    - `t_test_corrected`
-    - `t_test_13`
-    - `t_test_rel`
+- tests
+  - `t_test_corrected`
+  - `t_test_13`
+  - `t_test_rel`

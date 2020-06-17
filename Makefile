@@ -12,17 +12,27 @@ clean:
 	rm -rf doc/modules
 	rm -rf examples/.ipynb_checkpoints
 
+docs: clean install
+	cd doc && make html
+
+test-code:
+	py.test weles
+
+test-coverage:
+	rm -rf coverage .coverage
+	py.test --cov-report term-missing:skip-covered --cov=weles weles
+
+test: clean test-coverage
+
 code-analysis:
 	flake8 weles | grep -v __init__
 	pylint -E weles/ -d E1103,E0611,E1101
 
 upload:
-	python setup.py sdist upload -r pypi
-	pip install --upgrade weles
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
+	pip3 install --upgrade weles
 
 install: clean
-	pip uninstall weles --yes
-	python setup.py install --record files.txt
-	cat files.txt | xargs rm -rf
-	rm files.txt
-	python setup.py install --force
+	python setup.py clean
+	python setup.py develop

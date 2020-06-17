@@ -39,7 +39,7 @@ class RAO(BaseEstimator):
         self.scores = np.zeros(self.n_splits)
 
         # Build regression model
-        kfold = KFold(()
+        kfold = KFold(
             n_splits=self.n_splits, shuffle=True, random_state=self.random_state
         )
         for fold, (train, test) in enumerate(kfold.split(X)):
@@ -85,7 +85,7 @@ class RAO(BaseEstimator):
         )
 
         if len(y_pred_ensemble.shape) == 3:
-            y_pred_ensemble = y_pred_ensemble[:,:,0]
+            y_pred_ensemble = y_pred_ensemble[:, :, 0]
         print("YPREDENS", y_pred_ensemble.shape)
 
         # print(y_pred_ensemble.shape)
