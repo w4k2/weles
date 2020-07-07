@@ -39,12 +39,11 @@ class Evaluator():
         metrics: dictonary that contains metrics names and functions
                  ["name"] : function
         """
-        self.metrics = metrics
-        self.scores = np.zeros((len(self.datasets), len(self.clfs),
-                                len(self.metrics)))
+        _ = (len(self.datasets), len(self.clfs), len(metrics))
+
+        self.scores = np.zeros(_)
 
         # Flatten or not...
         if return_std:
-            self.stds = np.zeros((len(self.datasets), len(self.clfs),
-                                  len(self.metrics)))
+            self.stds = np.zeros(_)
             return self.scores, self.stds
