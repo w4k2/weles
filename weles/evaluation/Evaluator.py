@@ -32,8 +32,8 @@ class Evaluator():
                  ["name"] : function
         """
         self.metrics = metrics
-        scores = np.zeros(len(self.datasets), (len(self.clfs), len(self.metrics)))
-        if return_std:
-            stds = np.zeros(len(self.datasets), (len(self.clfs), len(self.metrics)))
+        self.scores = np.zeros(((len(self.datasets),len(self.clfs), len(self.metrics)))
 
-        return scores
+        if return_std:
+            self.stds = np.zeros(((len(self.datasets), len(self.clfs), len(self.metrics)))
+        return self.scores
