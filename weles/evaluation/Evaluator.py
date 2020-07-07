@@ -9,7 +9,7 @@ Authors:
 
 
 class Evaluator():
-    def __init__(self, datasets, protocol):
+    def __init__(self, datasets, protocol=(1,5,None)):
         self.datasets = datasets
         self.protocol = protocol
 
