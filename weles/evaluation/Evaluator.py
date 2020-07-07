@@ -7,6 +7,7 @@ Authors:
 
 # imports
 import numpy as np
+from sklearn.model_selection import RepeatedStratifiedKFold
 
 
 class Evaluator():
@@ -22,6 +23,13 @@ class Evaluator():
               ["name"] : obj
         """
         self.clfs = clfs
+
+        # Establish protocol
+        m, k, random_state = self.protocol
+
+        skf = RepeatedStratifiedKFold(n_splits=k, n_repeats=m,
+                                      random_state=random_state)
+
         return self
 
     def score(self, metrics, return_std=True):
@@ -32,8 +40,11 @@ class Evaluator():
                  ["name"] : function
         """
         self.metrics = metrics
-        self.scores = np.zeros(((len(self.datasets),len(self.clfs), len(self.metrics)))
+        self.scores = np.zeros((len(self.datasets), len(self.clfs),
+                                len(self.metrics)))
 
+        # Flatten or not...
         if return_std:
-            self.stds = np.zeros(((len(self.datasets), len(self.clfs), len(self.metrics)))
-        return self.scores
+            self.stds = np.zeros((len(self.datasets), len(self.clfs),
+                                  len(self.metrics)))
+            return self.scores, self.stds
