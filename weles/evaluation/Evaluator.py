@@ -8,6 +8,7 @@ Authors:
 # imports
 import numpy as np
 from sklearn.model_selection import RepeatedStratifiedKFold
+from sklearn.base import clone
 
 
 class Evaluator():
@@ -17,8 +18,11 @@ class Evaluator():
 
     def process(self, clfs):
         """
-        description
+        This function is used to process declared evaluation protocol
+        through all given datasets and classifiers.
+        It results with stored predictions and corresponding labels.
 
+        Input atguments description:
         clfs: dictonary that contains estimators names and objects
               ["name"] : obj
         """
@@ -29,6 +33,18 @@ class Evaluator():
 
         skf = RepeatedStratifiedKFold(n_splits=k, n_repeats=m,
                                       random_state=random_state)
+        self.predictions = np.zeros([len(self.datasets), len(self.clfs),
+                                     m*k])
+        self.true_values = np.zeros([len(self.datasets), m*k])
+        for dataset_id, dataset_name in self.datasets:
+            X, y = self.datasets[dataset_name]
+            for fold_id, (train, test) in enumerate(skf.split(X, y)):
+                self.true_values[dataset_id, fold_id] = y[test]
+                for clf_id, clf_name in self.clfs:
+                    clf = clone(self.clfs[clf_name])
+                    clf.fit(X[train], y[train])
+                    y_pred = clf.predict(X[test])
+                    self.predictions[dataset_id, clf_id, fold_id] = y_pred
 
         return self
 
@@ -36,6 +52,7 @@ class Evaluator():
         """
         description
 
+        Input arguments description:
         metrics: dictonary that contains metrics names and functions
                  ["name"] : function
         """
