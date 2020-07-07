@@ -7,6 +7,7 @@ from . import meta
 from . import optimizers
 from . import statistics
 from . import evaluation
+from . import utils
 
 __all__ = [
     "classifiers",
@@ -15,5 +16,6 @@ __all__ = [
     "optimizers",
     "statistics",
     "evaluation",
+    "utils",
     "__version__",
 ]
