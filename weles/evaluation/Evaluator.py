@@ -6,10 +6,11 @@ Authors:
 """
 
 # imports
+import numpy as np
 
 
 class Evaluator():
-    def __init__(self, datasets, protocol=(1,5,None)):
+    def __init__(self, datasets, protocol=(1, 5, None)):
         self.datasets = datasets
         self.protocol = protocol
 
@@ -20,13 +21,19 @@ class Evaluator():
         clfs: dictonary that contains estimators names and objects
               ["name"] : obj
         """
-        pass
+        self.clfs = clfs
+        return self
 
-    def score(self, metrcis):
+    def score(self, metrics, return_std=True):
         """
         description
 
         metrics: dictonary that contains metrics names and functions
                  ["name"] : function
         """
-        pass
+        self.metrics = metrics
+        scores = np.zeros(len(self.datasets), (len(self.clfs), len(self.metrics)))
+        if return_std:
+            stds = np.zeros(len(self.datasets), (len(self.clfs), len(self.metrics)))
+
+        return scores
