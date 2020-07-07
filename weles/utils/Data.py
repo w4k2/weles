@@ -7,6 +7,7 @@ import numpy as np
 import os
 import re
 
+
 class Data():
     def __init__(self, selection, path="../../datasets/"):
         self.selection = selection
@@ -15,6 +16,11 @@ class Data():
     def load(self):
         """
         description
+
+        Returns:
+        datasets: dictionary containing dataset name and and a numpy array with
+                  features and labels
+                  "name" : numpy array (n_samples, n_features+1)
         """
         # load files
         files = self.__dir2files(path=self.path)
@@ -45,7 +51,7 @@ class Data():
     def __tags4Xy(self, X, y):
         tags = []
         numberOfFeatures = X.shape[1]
-        numberOfSamples = len(y)
+        # numberOfSamples = len(y)
         numberOfClasses = len(np.unique(y))
         if numberOfClasses == 2:
             tags.append("binary")
@@ -65,7 +71,6 @@ class Data():
             tags.append("balanced")
         return tags
 
-
     def __csv2Xy(self, path):
         ds = np.genfromtxt(path, delimiter=",")
         X = ds[:, :-1]
@@ -75,9 +80,9 @@ class Data():
         return ds, dbname, tags
         # return datasets
 
-    def __dir2files(self, path, extention="csv"):
+    def __dir2files(self, path, extension="csv"):
         return [
             path + x
             for x in os.listdir(path)
-            if re.match("^([a-zA-Z0-9-_])+\.%s$" % extention, x)
+            if re.match("^([a-zA-Z0-9-_])+\.%s$" % extension, x)
         ]
