@@ -29,21 +29,21 @@ class Data():
         if type(self.selection) == tuple:
             tag_filter = self.selection[1]
             for file in files:
-                ds, dbname, tags = self.__csv2Xy(file)
+                X, y, dbname, tags = self.__csv2Xy(file)
                 if self.selection[0] == 'all':
                     is_good = all(elem in tags for elem in tag_filter)
                 if self.selection[0] == 'any':
                     is_good = any(elem in tags for elem in tag_filter)
                 if is_good:
-                    datasets[dbname] = ds
+                    datasets[dbname] = (X, y)
 
         # Load datasets by name
         elif type(self.selection) == list:
             for file in files:
-                ds, dbname, _ = self.__csv2Xy(file)
+                X, y, dbname, _ = self.__csv2Xy(file)
                 is_good = dbname in self.selection
                 if is_good:
-                    datasets[dbname] = ds
+                    datasets[dbname] = (X, y)
         else:
             print("Provide a list or a tuple")
         return datasets
@@ -77,7 +77,7 @@ class Data():
         y = ds[:, -1].astype(int)
         dbname = path.split("/")[-1].split(".")[0]
         tags = self.__tags4Xy(X, y)
-        return ds, dbname, tags
+        return X, y, dbname, tags
         # return datasets
 
     def __dir2files(self, path, extension="csv"):
