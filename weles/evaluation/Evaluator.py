@@ -34,8 +34,8 @@ class Evaluator():
         skf = RepeatedStratifiedKFold(n_splits=k, n_repeats=m,
                                       random_state=random_state)
         self.predictions = np.zeros([len(self.datasets), len(self.clfs),
-                                     m*k])
-        self.true_values = np.zeros([len(self.datasets), m*k])
+                                     m*k], dtype=object)
+        self.true_values = np.zeros([len(self.datasets), m*k], dtype=object)
         for dataset_id, dataset_name in enumerate(self.datasets):
             X, y = self.datasets[dataset_name]
             for fold_id, (train, test) in enumerate(skf.split(X, y)):
