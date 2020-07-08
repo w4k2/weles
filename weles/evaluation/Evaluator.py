@@ -36,15 +36,15 @@ class Evaluator():
         self.predictions = np.zeros([len(self.datasets), len(self.clfs),
                                      m*k])
         self.true_values = np.zeros([len(self.datasets), m*k])
-        for dataset_id, dataset_name in self.datasets:
+        for dataset_id, dataset_name in enumerate(self.datasets):
             X, y = self.datasets[dataset_name]
             for fold_id, (train, test) in enumerate(skf.split(X, y)):
                 self.true_values[dataset_id, fold_id] = y[test]
-                for clf_id, clf_name in self.clfs:
+                for clf_id, clf_name in enumerate(self.clfs):
                     clf = clone(self.clfs[clf_name])
                     clf.fit(X[train], y[train])
                     y_pred = clf.predict(X[test])
-                    self.predictions[dataset_id, clf_id, fold_id] = y_pred
+                    self.predictions[dataset_id, clf_id, fold_id] = [y_pred]
 
         return self
 
