@@ -9,12 +9,14 @@ Authors:
 import numpy as np
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.base import clone
+from tabulate import tabulate
 
 
 class Evaluator():
-    def __init__(self, datasets, protocol=(1, 5, None)):
+    def __init__(self, datasets, protocol=(1, 5, None), verbose=False):
         self.datasets = datasets
         self.protocol = protocol
+        self.verbose = verbose
 
     def process(self, clfs):
         """
@@ -75,6 +77,14 @@ class Evaluator():
                     self.scores[dataset_id, clf_id, metric_id] = np.mean(partial_scores)
                     if return_std:
                         self.stds[dataset_id, clf_id, metric_id] = np.std(partial_scores)
+
+        if self.verbose:
+            for m, metric in enumerate(self.metrics):
+                print("################ ", metric, " ################")
+                scores_ = self.scores[:,:,m]
+                names_column = np.array(list(self.datasets.keys())).reshape(len(self.datasets),-1)
+                scores_table = np.concatenate((names_column, scores_), axis=1)
+                print(tabulate(scores_table, headers=self.clfs.keys(), floatfmt=".3f"), scores_table.shape)
 
         if return_std:
             return self.scores, self.stds
