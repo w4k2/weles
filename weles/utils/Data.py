@@ -48,6 +48,27 @@ class Data():
             print("Provide a list or a tuple")
         return datasets
 
+    def multiply_dim(self, multiply=2):
+        # load files
+        files = self.__dir2files(path=self.path)
+        datasets = {}
+
+        # Load datasets by name
+        if type(self.selection) == list:
+            for file in files:
+                X, y, dbname, _ = self.__csv2Xy(file)
+                is_good = dbname in self.selection
+                if is_good:
+                    datasets[dbname + "_1"] = (X, y)
+                    Xm = X
+                    for i in range(multiply):
+                        Xm = np.concatenate((Xm, X), axis=1)
+                        dbname_m = dbname + "_" + str(i+2)
+                        datasets[dbname_m] = (Xm, y)
+        else:
+            print("Provide a list of dataset names")
+        return datasets
+
     def __tags4Xy(self, X, y):
         tags = []
         numberOfFeatures = X.shape[1]
