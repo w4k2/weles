@@ -38,20 +38,9 @@ class Evaluator():
                                      m*k], dtype=object)
         self.true_values = np.zeros([len(self.datasets), m*k], dtype=object)
 
-        if verbose:
-            enum_dataset = enumerate(tqdm(self.datasets, desc="DTS", ascii=True))
-        else:
-            enum_dataset = enumerate(self.datasets)
-
-        for dataset_id, dataset_name in enum_dataset:
+        for dataset_id, dataset_name in enumerate(tqdm(self.datasets, desc="DTS", ascii=True, disable=not verbose)):
             X, y = self.datasets[dataset_name]
-
-            if verbose:
-                enum_fold = enumerate(tqdm(skf.split(X, y), desc="FLD", ascii=True))
-            else:
-                enum_fold = enumerate(skf.split(X, y))
-                
-            for fold_id, (train, test) in enum_fold:
+            for fold_id, (train, test) in enumerate(tqdm(skf.split(X, y), desc="FLD", ascii=True, disable=not verbose)):
                 self.true_values[dataset_id, fold_id] = y[test]
                 for clf_id, clf_name in enumerate(self.clfs):
                     clf = clone(self.clfs[clf_name])
