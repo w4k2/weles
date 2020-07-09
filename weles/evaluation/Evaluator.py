@@ -10,14 +10,14 @@ import numpy as np
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.base import clone
 from tabulate import tabulate
-
+from tqdm import tqdm
 
 class Evaluator():
     def __init__(self, datasets, protocol=(1, 5, None)):
         self.datasets = datasets
         self.protocol = protocol
 
-    def process(self, clfs):
+    def process(self, clfs, verbose=False):
         """
         This function is used to process declared evaluation protocol
         through all given datasets and classifiers.
@@ -37,9 +37,21 @@ class Evaluator():
         self.predictions = np.zeros([len(self.datasets), len(self.clfs),
                                      m*k], dtype=object)
         self.true_values = np.zeros([len(self.datasets), m*k], dtype=object)
-        for dataset_id, dataset_name in enumerate(self.datasets):
+
+        if verbose:
+            enum_dataset = enumerate(tqdm(self.datasets, desc="DTS", ascii=True))
+        else:
+            enum_dataset = enumerate(self.datasets)
+
+        for dataset_id, dataset_name in enum_dataset:
             X, y = self.datasets[dataset_name]
-            for fold_id, (train, test) in enumerate(skf.split(X, y)):
+
+            if verbose:
+                enum_fold = enumerate(tqdm(skf.split(X, y), desc="FLD", ascii=True))
+            else:
+                enum_fold = enumerate(skf.split(X, y))
+                
+            for fold_id, (train, test) in enum_fold:
                 self.true_values[dataset_id, fold_id] = y[test]
                 for clf_id, clf_name in enumerate(self.clfs):
                     clf = clone(self.clfs[clf_name])
