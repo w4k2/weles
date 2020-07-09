@@ -13,10 +13,9 @@ from tabulate import tabulate
 
 
 class Evaluator():
-    def __init__(self, datasets, protocol=(1, 5, None), verbose=False):
+    def __init__(self, datasets, protocol=(1, 5, None)):
         self.datasets = datasets
         self.protocol = protocol
-        self.verbose = verbose
 
     def process(self, clfs):
         """
@@ -50,7 +49,7 @@ class Evaluator():
 
         return self
 
-    def score(self, metrics, return_std=True):
+    def score(self, metrics, return_std=True, verbose=False):
         """
         description
 
@@ -78,7 +77,7 @@ class Evaluator():
                     if return_std:
                         self.stds[dataset_id, clf_id, metric_id] = np.std(partial_scores)
 
-        if self.verbose:
+        if verbose:
             for m, metric in enumerate(self.metrics):
                 print("################ ", metric, " ################")
                 scores_ = self.scores[:,:,m]
