@@ -11,6 +11,7 @@ from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.base import clone
 from tabulate import tabulate
 from tqdm import tqdm
+from scipy.stats import rankdata
 
 class Evaluator():
     def __init__(self, datasets, protocol=(1, 5, None)):
@@ -50,7 +51,7 @@ class Evaluator():
 
         return self
 
-    def score(self, metrics, return_std=True, verbose=False):
+    def score(self, metrics, return_std=False, verbose=False):
         """
         description
 
@@ -82,9 +83,20 @@ class Evaluator():
             for m, metric in enumerate(self.metrics):
                 print("################ ", metric, " ################")
                 scores_ = self.scores[:,:,m]
-                names_column = np.array(list(self.datasets.keys())).reshape(len(self.datasets),-1)
+
+                # ranks
+                ranks = []
+                for row in scores_:
+                    ranks.append(rankdata(row).tolist())
+                ranks = np.array(ranks)
+                mean_ranks = np.mean(ranks, axis=0)
+
+                names_column = np.array(list(self.datasets.keys())).reshape(len(self.datasets), -1)
                 scores_table = np.concatenate((names_column, scores_), axis=1)
                 print(tabulate(scores_table, headers=self.clfs.keys(), floatfmt=".3f"), scores_table.shape)
+
+                print("################ Mean ranks ################")
+                print(tabulate(mean_ranks[np.newaxis,:], headers=self.clfs.keys(), floatfmt=".3f" ))
 
         if return_std:
             return self.scores, self.stds
