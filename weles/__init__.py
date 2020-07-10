@@ -8,6 +8,7 @@ from . import optimizers
 from . import statistics
 from . import evaluation
 from . import utils
+from . import metrics
 
 __all__ = [
     "classifiers",
@@ -17,5 +18,6 @@ __all__ = [
     "statistics",
     "evaluation",
     "utils",
+    "metrics",
     "__version__",
 ]
