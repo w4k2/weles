@@ -9,7 +9,7 @@ class PairedTests():
         self.evaluator = evaluator
 
     def process(self, test_name, alpha=.05, m_fmt="%.3f", std_fmt=None,
-                nc="---", db_fmt="%s", **kwargs):
+                nc="---", db_fmt="%s", tablefmt="plain", **kwargs):
         try:
             test, tkwargs = statistics.IMPLEMENTED_TESTS[test_name]
             # Remove kwarg missmatches and update tkwargs
@@ -69,7 +69,7 @@ class PairedTests():
 
                     # Store formatted table
                     tables.update({m_name: tabulate(
-                        t, headers=['DATASET'] + clfs)})
+                        t, headers=['DATASET'] + clfs, tablefmt=tablefmt)})
 
                 return tables
             except AttributeError:

@@ -11,10 +11,10 @@ from sklearn.metrics import accuracy_score
 import weles as ws
 
 datasets = {
-    "jeż": make_classification(random_state=1410, n_samples=2000),
-    "kot": make_classification(random_state=1994, n_samples=2000),
-    "lis": make_classification(random_state=1989, n_samples=2000),
-    "byk": make_classification(random_state=1992, n_samples=2000,
+    "jeż": make_classification(random_state=1410, n_samples=1000),
+    "kot": make_classification(random_state=1994, n_samples=1000),
+    "lis": make_classification(random_state=1989, n_samples=1000),
+    "byk": make_classification(random_state=1992, n_samples=1000,
                                weights=(.9, .1))
 }
 metrics = {
@@ -28,11 +28,31 @@ clfs = {
 }
 
 ev = ws.evaluation.Evaluator(datasets=datasets,
-                             protocol=(1, 5, 1410)).process(clfs=clfs)
-
+                             protocol=(5, 5, 1410)).process(clfs=clfs)
 scores = ev.score(metrics=metrics)
-pt = ws.evaluation.PairedTests(ev)
-tables = pt.process('t_test_13', corr=.1, std_fmt="(%.2f)")
+
+# Kasia to właśnie ja
+tables = ws.evaluation.PairedTests(ev).process(
+    't_test_corrected', J=5, k=5, tablefmt="plain"
+)
+
+for metric in tables:
+    print("\n%s\n" % metric)
+    print(tables[metric])
+
+# Smutna korekta
+tables = ws.evaluation.PairedTests(ev).process(
+    't_test_13', corr=.2, tablefmt="plain", std_fmt="(%.2f)"
+)
+
+for metric in tables:
+    print("\n%s\n" % metric)
+    print(tables[metric])
+
+# I zwykły test
+tables = ws.evaluation.PairedTests(ev).process(
+    't_test_rel', corr=.2, tablefmt="github"
+)
 
 for metric in tables:
     print("\n%s\n" % metric)
