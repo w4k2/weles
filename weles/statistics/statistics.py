@@ -1,3 +1,7 @@
+import numpy as np
+from scipy import stats
+
+
 def t_test_corrected(a, b):
     """
     Corrected t-test for repeated cross-validation.
@@ -40,3 +44,10 @@ def t_test_rel(a, b):
     t_stat = bar_d / np.sqrt(bar_sigma_2_mod)
     pval = stats.t.sf(np.abs(t_stat), J - 1) * 2
     return t_stat, pval
+
+
+IMPLEMENTED_TESTS = {
+    "t_test_corrected": (t_test_corrected, {}),
+    "t_test_13": (t_test_13, {'corr': 0.6}),
+    "t_test_rel": (t_test_rel, {})
+}
