@@ -24,3 +24,6 @@ def test_evaluator():
     ev = ws.evaluation.Evaluator(datasets={"dup": dataset()})
     ev.process(clfs=clfs, verbose=True)
     ev.score(metrics=metrics, verbose=True)
+    ws.evaluation.PairedTests(ev).process(
+        't_test_13', corr=.2, tablefmt="plain", std_fmt="(%.2f)"
+    )
