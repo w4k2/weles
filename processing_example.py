@@ -9,6 +9,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 import weles as ws
+import time
 
 datasets = {
     "jeż": make_classification(random_state=1410, n_samples=1000),
@@ -27,8 +28,16 @@ clfs = {
     "CART": DecisionTreeClassifier(random_state=1410)
 }
 
-ev = ws.evaluation.Evaluator(datasets=datasets,
-                             protocol=(5, 5, 1410)).process(clfs=clfs)
+
+start = time.time()
+ev = ws.evaluation.Evaluator(datasets=datasets, store='storage',
+                             protocol=(1, 5, 1410)).process(clfs=clfs)
+
+end = time.time()
+print("HELLO!")
+print(end - start)
+
+exit()
 scores = ev.score(metrics=metrics)
 
 # Kasia to właśnie ja
