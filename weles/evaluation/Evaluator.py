@@ -13,6 +13,9 @@ from tabulate import tabulate
 from tqdm import tqdm
 from scipy.stats import rankdata
 
+VERBOSE_COLUMNS = 80
+
+
 class Evaluator():
     def __init__(self, datasets, protocol=(1, 5, None)):
         self.datasets = datasets
@@ -31,17 +34,22 @@ class Evaluator():
         self.clfs = clfs
 
         # Establish protocol
-        m, k, random_state = self.protocol
+        self.m, self.k, self.random_state = self.protocol
 
-        skf = RepeatedStratifiedKFold(n_splits=k, n_repeats=m,
-                                      random_state=random_state)
+        skf = RepeatedStratifiedKFold(n_splits=self.k, n_repeats=self.m,
+                                      random_state=self.random_state)
         self.predictions = np.zeros([len(self.datasets), len(self.clfs),
-                                     m*k], dtype=object)
-        self.true_values = np.zeros([len(self.datasets), m*k], dtype=object)
+                                     self.m * self.k], dtype=object)
+        self.true_values = np.zeros([len(self.datasets), self.m * self.k],
+                                    dtype=object)
 
-        for dataset_id, dataset_name in enumerate(tqdm(self.datasets, desc="DTS", ascii=True, disable=not verbose)):
+        # Iterate over datasets
+        for dataset_id, dataset_name in enumerate(tqdm(self.datasets,
+                                                       desc="DTS",
+                                                       ascii=True,
+                                                       disable=not verbose)):
             X, y = self.datasets[dataset_name]
-            for fold_id, (train, test) in enumerate(tqdm(skf.split(X, y), desc="FLD", ascii=True, disable=not verbose)):
+            for fold_id, (train, test) in enumerate(skf.split(X, y)):
                 self.true_values[dataset_id, fold_id] = y[test]
                 for clf_id, clf_name in enumerate(self.clfs):
                     clf = clone(self.clfs[clf_name])
@@ -51,7 +59,7 @@ class Evaluator():
 
         return self
 
-    def score(self, metrics, return_std=False, verbose=False):
+    def score(self, metrics, verbose=False, return_flatten=True):
         """
         description
 
@@ -60,29 +68,31 @@ class Evaluator():
                  ["name"] : function
         """
         self.metrics = metrics
-        _ = (len(self.datasets), len(self.clfs), len(metrics))
-        # Flatten or not...
-        if return_std:
-            self.stds = np.zeros(_)
 
-        self.scores = np.zeros(_)
-        m, k, random_state = self.protocol
-        for dataset_id, dataset_name in enumerate(self.datasets):
-            for clf_id, clf_name in enumerate(self.clfs):
-                for metric_id, metric_name in enumerate(self.metrics):
-                    partial_scores = np.zeros([m*k])
-                    for i in range(m*k):
-                        y_test = self.true_values[dataset_id, i]
-                        y_pred = self.predictions[dataset_id, clf_id, i]
-                        partial_scores[i] = self.metrics[metric_name](y_test, y_pred)
-                    self.scores[dataset_id, clf_id, metric_id] = np.mean(partial_scores)
-                    if return_std:
-                        self.stds[dataset_id, clf_id, metric_id] = np.std(partial_scores)
+        # Prepare storage for scores
+        # DB x CLF x FOLD x METRIC
+        self.scores = np.array([[[[
+            metrics[m_name](
+                self.predictions[db_idx, clf_idx, f_idx],
+                self.true_values[db_idx, f_idx])
+            for m_name in self.metrics]
+            for f_idx in range(self.m * self.k)]
+            for clf_idx, clf in enumerate(self.clfs)]
+            for db_idx, db_name in enumerate(self.datasets)])
 
+        # Store mean scores and stds
+        # DB x CLF x METRIC
+        self.mean_scores = np.mean(self.scores, axis=2)
+        self.stds = np.std(self.scores, axis=2)
+
+        # Verbose mode
         if verbose:
+            lmn = len(max(list(self.metrics.keys()), key=len))
+            lmc = (VERBOSE_COLUMNS-lmn)//2
             for m, metric in enumerate(self.metrics):
-                print("################ ", metric, " ################")
-                scores_ = self.scores[:,:,m]
+                print(lmc*"#", metric.center(lmn), lmc*"#")
+
+                scores_ = self.mean_scores[:, :, m]
 
                 # ranks
                 ranks = []
@@ -91,14 +101,18 @@ class Evaluator():
                 ranks = np.array(ranks)
                 mean_ranks = np.mean(ranks, axis=0)
 
-                names_column = np.array(list(self.datasets.keys())).reshape(len(self.datasets), -1)
+                names_column = np.array(list(self.datasets.keys())).reshape(
+                    len(self.datasets), -1)
                 scores_table = np.concatenate((names_column, scores_), axis=1)
-                print(tabulate(scores_table, headers=self.clfs.keys(), floatfmt=".3f"), scores_table.shape)
+                print(tabulate(scores_table, headers=self.clfs.keys(),
+                               floatfmt=".3f"))
 
-                print("################ Mean ranks ################")
-                print(tabulate(mean_ranks[np.newaxis,:], headers=self.clfs.keys(), floatfmt=".3f" ))
+                print(lmc*"-", "Mean ranks".center(lmn), lmc*"-")
+                print(tabulate(mean_ranks[np.newaxis, :],
+                               headers=self.clfs.keys(), floatfmt=".3f"))
 
-        if return_std:
-            return self.scores, self.stds
-        else:
-            return self.scores
+        # Give output
+        return {
+            True: (self.mean_scores, self.stds),
+            False: self.scores,
+        }[return_flatten]

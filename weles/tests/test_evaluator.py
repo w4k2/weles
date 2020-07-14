@@ -22,5 +22,5 @@ def test_evaluator():
             "DTC": DecisionTreeClassifier()}
 
     ev = ws.evaluation.Evaluator(datasets={"dup": dataset()})
-    ev.process(clfs=clfs)
-    ev.score(metrics=metrics)
+    ev.process(clfs=clfs, verbose=True)
+    ev.score(metrics=metrics, verbose=True)
