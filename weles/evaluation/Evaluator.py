@@ -93,7 +93,8 @@ class Evaluator():
         m.update(gt.encode("ascii"))
         with open(inspect.getfile(clf.__class__), 'r') as file:
             m.update(file.read().encode("utf8"))
-
+        m.update(str(clf).encode("ascii"))
+        
         return(m.hexdigest())
 
     def _storage_key_gt(self, X, y, fold_id):
@@ -101,7 +102,7 @@ class Evaluator():
             return None
 
         m = md5()
-        m.update(X)
+        m.update(X.copy(order='C'))
         m.update(y)
         m.update(str(fold_id).encode("ascii"))
         m.update(str(self.m).encode("ascii"))
