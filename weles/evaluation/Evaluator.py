@@ -94,7 +94,7 @@ class Evaluator():
         with open(inspect.getfile(clf.__class__), 'r') as file:
             m.update(file.read().encode("utf8"))
         m.update(str(clf).encode("ascii"))
-        
+
         return(m.hexdigest())
 
     def _storage_key_gt(self, X, y, fold_id):
@@ -140,6 +140,7 @@ class Evaluator():
         if verbose:
             lmn = len(max(list(self.metrics.keys()), key=len))
             lmc = (VERBOSE_COLUMNS-lmn)//2
+            self.mean_ranks = []
             for m, metric in enumerate(self.metrics):
                 print(lmc*"#", metric.center(lmn), lmc*"#")
 
@@ -151,7 +152,7 @@ class Evaluator():
                     ranks.append(rankdata(row).tolist())
                 ranks = np.array(ranks)
                 mean_ranks = np.mean(ranks, axis=0)
-
+                self.mean_ranks.append(mean_ranks)
                 names_column = np.array(list(self.datasets.keys())).reshape(
                     len(self.datasets), -1)
                 scores_table = np.concatenate((names_column, scores_), axis=1)
@@ -161,7 +162,7 @@ class Evaluator():
                 print(lmc*"-", "Mean ranks".center(lmn), lmc*"-")
                 print(tabulate(mean_ranks[np.newaxis, :],
                                headers=self.clfs.keys(), floatfmt=".3f"))
-
+            self.mean_ranks = np.array(self.mean_ranks)
         # Give output
         return {
             True: (self.mean_scores, self.stds),

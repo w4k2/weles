@@ -6,7 +6,7 @@ Class for preparing datasets for the evaluator.
 import numpy as np
 import os
 import re
-
+import collections
 
 class Data():
     def __init__(self, selection, path="../../datasets/"):
@@ -46,7 +46,10 @@ class Data():
                     datasets[dbname] = (X, y)
         else:
             print("Provide a list or a tuple")
-        return datasets
+        datasets_items = datasets.items()
+        sorted_datasets = sorted(datasets_items)
+        sorted_datasets = collections.OrderedDict(sorted_datasets)
+        return sorted_datasets
 
     def multiply_dim(self, multiply=2):
         # load files
