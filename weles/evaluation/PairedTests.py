@@ -2,6 +2,7 @@ import numpy as np
 from ..statistics import statistics
 import warnings
 from tabulate import tabulate
+from scipy.stats import rankdata, ranksums
 
 
 class PairedTests():
@@ -63,8 +64,11 @@ class PairedTests():
                                        for i in range(n_clfs)]
 
                         # Row with conclusions
+                        # t.append([''] + [", ".join(["%i" % i for i in c])
+                        #                  if len(c) > 0 else nc
+                        #                  for c in conclusions])
                         t.append([''] + [", ".join(["%i" % i for i in c])
-                                         if len(c) > 0 else nc
+                                         if len(c) > 0 and len(c) < len(clfs)-1 else ("all" if len(c) == len(clfs)-1 else nc)
                                          for c in conclusions])
 
                     # Store formatted table
@@ -80,3 +84,42 @@ class PairedTests():
                 test_name, ", ".join(list(statistics.IMPLEMENTED_TESTS.keys()))
             )
             warnings.warn(WARN_MESSAGE)
+
+    def global_ranks(self, alpha=.05, nc="---", tablefmt="plain", name=''):
+        ranks = self.evaluator.ranks
+        clfs = list(self.evaluator.clfs.keys())
+        mean_ranks = np.mean(ranks, axis=1)
+        t = []
+
+        for m, metric in enumerate(self.evaluator.metrics):
+            metric_ranks = ranks[m,:,:]
+            length = len(self.evaluator.clfs)
+
+            s = np.zeros((length, length))
+            p = np.zeros((length, length))
+
+            for i in range(length):
+                for j in range(length):
+                    s[i, j], p[i, j] = ranksums(metric_ranks.T[i], metric_ranks.T[j])
+            _ = np.where((p < alpha) * (s > 0))
+            conclusions = [list(1 + _[1][_[0] == i])
+                           for i in range(length)]
+
+            t.append(["%s" % name] + ["%.3f" %
+                                           v for v in
+                                           mean_ranks[m]])
+
+            # t.append([''] + [", ".join(["%i" % i for i in c])
+            #                  if len(c) > 0 else nc
+            #                  for c in conclusions])
+            t.append([''] + [", ".join(["%i" % i for i in c])
+                             if len(c) > 0 and len(c) < len(clfs)-1 else ("all" if len(c) == len(clfs)-1 else nc)
+                             for c in conclusions])
+
+        # print(t)
+        # print(tabulate(t, headers=(clfs), tablefmt=tablefmt))
+        return t
+            # print("chuj")
+            # exit()
+            # print(mean_ranks[m].shape, np.array(conclusions).shape)
+            # print(table)
