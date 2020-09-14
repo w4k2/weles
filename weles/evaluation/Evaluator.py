@@ -136,36 +136,34 @@ class Evaluator():
         self.mean_scores = np.mean(self.scores, axis=2)
         self.stds = np.std(self.scores, axis=2)
 
-        # Verbose mode
-        if verbose:
-            lmn = len(max(list(self.metrics.keys()), key=len))
-            lmc = (VERBOSE_COLUMNS-lmn)//2
-            self.mean_ranks = []
-            self.ranks = []
-            for m, metric in enumerate(self.metrics):
+        lmn = len(max(list(self.metrics.keys()), key=len))
+        lmc = (VERBOSE_COLUMNS-lmn)//2
+        self.mean_ranks = []
+        self.ranks = []
+        for m, metric in enumerate(self.metrics):
+            scores_ = self.mean_scores[:, :, m]
+
+            # ranks
+            ranks = []
+            for row in scores_:
+                ranks.append(rankdata(row).tolist())
+            ranks = np.array(ranks)
+            self.ranks.append(ranks)
+            mean_ranks = np.mean(ranks, axis=0)
+            self.mean_ranks.append(mean_ranks)
+            names_column = np.array(list(self.datasets.keys())).reshape(
+                len(self.datasets), -1)
+            scores_table = np.concatenate((names_column, scores_), axis=1)
+            if verbose:
                 print(lmc*"#", metric.center(lmn), lmc*"#")
-
-                scores_ = self.mean_scores[:, :, m]
-
-                # ranks
-                ranks = []
-                for row in scores_:
-                    ranks.append(rankdata(row).tolist())
-                ranks = np.array(ranks)
-                self.ranks.append(ranks)
-                mean_ranks = np.mean(ranks, axis=0)
-                self.mean_ranks.append(mean_ranks)
-                names_column = np.array(list(self.datasets.keys())).reshape(
-                    len(self.datasets), -1)
-                scores_table = np.concatenate((names_column, scores_), axis=1)
                 print(tabulate(scores_table, headers=self.clfs.keys(),
                                floatfmt=".3f"))
 
                 print(lmc*"-", "Mean ranks".center(lmn), lmc*"-")
                 print(tabulate(mean_ranks[np.newaxis, :],
                                headers=self.clfs.keys(), floatfmt=".3f"))
-            self.mean_ranks = np.array(self.mean_ranks)
-            self.ranks = np.array(self.ranks)
+        self.mean_ranks = np.array(self.mean_ranks)
+        self.ranks = np.array(self.ranks)
         # Give output
         return {
             True: (self.mean_scores, self.stds),

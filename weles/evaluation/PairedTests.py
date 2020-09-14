@@ -105,7 +105,7 @@ class PairedTests():
             conclusions = [list(1 + _[1][_[0] == i])
                            for i in range(length)]
 
-            t.append(["%s" % name] + ["%.3f" %
+            t.append(["%s" % metric] + ["%.3f" %
                                            v for v in
                                            mean_ranks[m]])
 
@@ -119,7 +119,3 @@ class PairedTests():
         # print(t)
         # print(tabulate(t, headers=(clfs), tablefmt=tablefmt))
         return t
-            # print("chuj")
-            # exit()
-            # print(mean_ranks[m].shape, np.array(conclusions).shape)
-            # print(table)
