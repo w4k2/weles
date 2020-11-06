@@ -65,7 +65,12 @@ class Data():
                     datasets[dbname + "_1"] = (X, y)
                     Xm = X
                     for i in range(multiply):
-                        Xm = np.concatenate((Xm, X), axis=1)
+                        # for j in range(10):
+                        rng = np.random.default_rng()
+                        noise = rng.standard_normal((X.shape[0],X.shape[1]))
+                        # print(X+noise)
+                        # exit()
+                        Xm = np.concatenate((Xm, X+noise), axis=1)
                         dbname_m = dbname + "_" + str(i+2)
                         datasets[dbname_m] = (Xm, y)
         else:
