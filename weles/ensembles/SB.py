@@ -3,7 +3,9 @@ Stratified Bagging.
 """
 from sklearn.base import ClassifierMixin, clone
 from sklearn.ensemble import BaseEnsemble
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import (check_X_y, check_array,
+                                      check_is_fitted,
+                                      check_random_state)
 import numpy as np
 from sklearn.metrics import accuracy_score
 from scipy.stats import mode
@@ -17,7 +19,7 @@ class SB(BaseEnsemble, ClassifierMixin):
         self.n_estimators = n_estimators
         self.voting = voting
         self.random_state = random_state
-        np.random.seed(self.random_state)
+        self.rng = check_random_state(self.random_state)
 
     def fit(self, X, y):
         """Fitting."""
@@ -29,7 +31,7 @@ class SB(BaseEnsemble, ClassifierMixin):
 
         for i in range(self.n_estimators):
             selected_samples = [
-                np.random.randint(
+                self.rng.randint(
                     0, self.X_[self.y_ == label].shape[0],
                     self.X_[self.y_ == label].shape[0])
                 for label in self.classes_
