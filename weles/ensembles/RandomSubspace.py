@@ -35,7 +35,7 @@ class RandomSubspace(BaseEstimator):
             axis=0,
         )
 
-        return esm.T
+        return esm
 
     def predict(self, X):
         pp = self.predict_proba(X)
