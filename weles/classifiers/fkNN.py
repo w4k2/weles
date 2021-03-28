@@ -8,9 +8,6 @@ class fkNN(BaseEstimator, ClassifierMixin):
     """
     Nearest Neighbors Classifier based on pytorch distances and able to employ
     fractional distances during neighborhood search.
-
-
-
     """
     def __init__(self, k=5, p=2):
         self.k = k
