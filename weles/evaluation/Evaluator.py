@@ -124,8 +124,8 @@ class Evaluator():
         # DB x CLF x FOLD x METRIC
         self.scores = np.array([[[[
             metrics[m_name](
-                self.predictions[db_idx, clf_idx, f_idx],
-                self.true_values[db_idx, f_idx])
+                self.true_values[db_idx, f_idx],
+                self.predictions[db_idx, clf_idx, f_idx])
             for m_name in self.metrics]
             for f_idx in range(self.m * self.k)]
             for clf_idx, clf in enumerate(self.clfs)]
