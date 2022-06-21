@@ -51,8 +51,26 @@ def t_test_rel(a, b):
     return t_stat, pval
 
 
+def cv52cft(a, b, J=5, k=2):
+    """
+    Combined 5x2CV F test.
+    input, two 2d arrays. Repetitions x folds
+    As default for 5x2CV
+    """
+    if J*k != a.shape[0]:
+        raise Exception('%i scores received, but J=%i, k=%i (J*k=%i)' % (
+            a.shape[0], J, k, J*k
+        ))
+
+    d = a.reshape(K, J) - b.reshape(K, J)
+    f_stat = np.sum(np.power(d, 2)) / (2 * np.sum(np.var(d, axis=0, ddof=0)))
+    p = 1 - stats.f.cdf(f_stat, J * k, J)
+    return f_stat, p
+
+
 IMPLEMENTED_TESTS = {
     "t_test_corrected": (t_test_corrected, {'J': 5, 'k': 5}),
     "t_test_13": (t_test_13, {'corr': 0.6}),
-    "t_test_rel": (t_test_rel, {})
+    "t_test_rel": (t_test_rel, {}),
+    "cv52cft": (cv52cft, {'J': 5, 'k': 2})
 }

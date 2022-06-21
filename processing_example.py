@@ -37,7 +37,6 @@ end = time.time()
 print("HELLO!")
 print(end - start)
 
-exit()
 scores = ev.score(metrics=metrics)
 
 # Kasia to właśnie ja
@@ -61,6 +60,15 @@ for metric in tables:
 # I zwykły test
 tables = ws.evaluation.PairedTests(ev).process(
     't_test_rel', corr=.2, tablefmt="github"
+)
+
+for metric in tables:
+    print("\n%s\n" % metric)
+    print(tables[metric])
+
+# Combined 5x2 CV F test
+tables = ws.evaluation.PairedTests(ev).process(
+    'cv52cft', corr=.2, tablefmt="github"
 )
 
 for metric in tables:
