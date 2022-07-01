@@ -20,7 +20,7 @@ test-code:
 
 test-coverage:
 	rm -rf coverage .coverage
-	py.test --cov-report term-missing:skip-covered --cov=weles weles
+	py.test --cov-report term-missing:skip-covered --cov-report xml:coverage.xml --cov=weles weles
 
 test: clean test-coverage
 
