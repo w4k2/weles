@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from torch import cdist, dist, from_numpy
+from scipy.spatial.distance import cdist
 from scipy.stats import mode
 
 class fkNN(BaseEstimator, ClassifierMixin):
@@ -19,7 +19,7 @@ class fkNN(BaseEstimator, ClassifierMixin):
         self.X_, self.y_ = X, y
 
     def predict_proba(self, X):
-        all_distances = cdist(from_numpy(X), from_numpy(self.X_), p=self.p).numpy()
+        all_distances = cdist(X, self.X_, p=self.p)
         self.neighbors_indx_ = np.argsort(all_distances)[:, :self.k]
         self.neighbors_pred_ = self.y_[self.neighbors_indx_]
         proba = np.array([np.sum(self.neighbors_pred_==l, axis=1)/self.k
