@@ -1,7 +1,6 @@
 from imblearn import under_sampling, over_sampling
 from sklearn import base, model_selection, metrics, preprocessing
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy import stats
 
 

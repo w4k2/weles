@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 import math
 from sklearn.neighbors import DistanceMetric
-from torch import cdist, from_numpy
+from scipy.spatial.distance import cdist
 
 
 class KNORAE(BaseEstimator, ClassifierMixin):
@@ -28,7 +28,7 @@ class KNORAE(BaseEstimator, ClassifierMixin):
         # kontener na wagi
         self.competences = np.zeros((X.shape[0], len(self.ensemble))).astype(int)
         # dystanse od testowych do DSEL
-        all_distances = cdist(from_numpy(X), from_numpy(self.X_dsel), p=self.p).numpy()
+        all_distances = cdist(X, self.X_dsel, p=self.p)
         reduce_local = True
 
         while reduce_local:

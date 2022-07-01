@@ -1,7 +1,6 @@
 import numpy as np
 from scipy import stats
 from sklearn.base import clone, ClassifierMixin, BaseEstimator
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 RULES = ["mean", "gmean", "hmean", "rbh"]
