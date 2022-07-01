@@ -1,6 +1,8 @@
 # Weles
 
 [![w4k2](https://circleci.com/gh/swojciechowski/weles.svg?style=shield)](https://circleci.com/gh/swojciechowski/weles)
+[![codecov](https://codecov.io/gh/swojciechowski/weles/branch/master/graph/badge.svg?token=PU9RKXP6XE)](https://codecov.io/gh/swojciechowski/weles)
+[![PyPI version](https://badge.fury.io/py/weles.svg)](https://badge.fury.io/py/weles)
 
 Collection of various pattern recognition methods and experimental tools made by Machine Learning Group of Wrocław University of Science and Technology
 
