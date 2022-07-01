@@ -23,7 +23,7 @@ URL = "https://github.com/w4k2/weles"
 LICENSE = "GPL-3.0"
 DOWNLOAD_URL = "https://github.com/w4k2/weles"
 VERSION = __version__
-INSTALL_REQUIRES = ["numpy", "scipy", "scikit-learn", "imblearn", "tabulate", "tqdm", "stream-learn"]
+INSTALL_REQUIRES = ["numpy", "scipy", "scikit-learn", "imblearn", "tabulate", "tqdm", "stream-learn", "pandas"]
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
