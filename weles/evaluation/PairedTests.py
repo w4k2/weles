@@ -51,15 +51,19 @@ class PairedTests():
                             t.append([''] + [std_fmt %
                                              v for v in
                                              stds[db_idx, :, m_idx]])
-                        # Calculate T and p
+                        # Calculate statistic and p
                         T, p = np.array(
                             [[test(scores[db_idx, i, :, m_idx],
                                    scores[db_idx, j, :, m_idx],
-                                   **tkwargs)
+                                   **tkwargs) if i != j else (0.0, 1.0)
                               for i in range(n_clfs)]
                              for j in range(n_clfs)]
                         ).swapaxes(0, 2)
-                        _ = np.where((p < alpha) * (T > 0))
+
+                        mean_adv = mean_scores[db_idx, :, m_idx] < mean_scores[db_idx, :, m_idx, np.newaxis]
+                        stat_adv = p < alpha
+
+                        _ = np.where(stat_adv * mean_adv)
                         conclusions = [list(1 + _[1][_[0] == i])
                                        for i in range(n_clfs)]
 
