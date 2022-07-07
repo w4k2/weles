@@ -59,11 +59,10 @@ class Evaluator():
         self.true_values = np.zeros([len(self.datasets), self.m * self.k],
                                     dtype=object)
 
+        bar = tqdm(self.datasets, disable=not verbose)
         # Iterate over datasets
-        for dataset_id, dataset_name in enumerate(tqdm(self.datasets,
-                                                       desc="DTS",
-                                                       ascii=True,
-                                                       disable=not verbose)):
+        for dataset_id, dataset_name in enumerate(bar):
+            bar.set_description(dataset_name.ljust(20))
             X, y = self.datasets[dataset_name]
             for fold_id, (train, test) in enumerate(skf.split(X, y)):
                 str_gt = self._storage_key_gt(X, y, fold_id)
