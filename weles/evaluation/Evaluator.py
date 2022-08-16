@@ -19,6 +19,10 @@ from joblib import Parallel, delayed
 
 VERBOSE_COLUMNS = 80
 
+COLOURS = ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#641975"]
+
+
+
 
 class Evaluator():
     def __init__(self, datasets, protocol=(1, 5, None), store=None, parallel_jobs=1):
@@ -47,7 +51,7 @@ class Evaluator():
     def process_one_dataset(self, dataset_name, dataset_id, verbose=False):
         X, y = self.datasets[dataset_name]
         skf = RepeatedStratifiedKFold(n_splits=self.k, n_repeats=self.m, random_state=self.random_state)
-        bar = tqdm(skf.split(X, y), disable=not verbose, leave=True, position=dataset_id, colour="CYAN")
+        bar = tqdm(skf.split(X, y), disable=not verbose, leave=True, position=dataset_id, colour=COLOURS[dataset_id % len(COLOURS)])
         bar.set_description(dataset_name.ljust(20))
         for fold_id, (train, test) in enumerate(bar):
             str_gt = self._storage_key_gt(X, y, fold_id)
